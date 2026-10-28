@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avto Ijara | Boshqaruv Tizimi (CRM)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Asosiy Konteyner -->
+    <div class="app-container">
+        
+        <!-- Yuqori qism (Navbar) -->
+        <header class="navbar">
+            <div class="nav-brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-car-side"></i>
+                </div>
+                <div>
+                    <h1>Avto<span>Ijara</span></h1>
+                    <p class="brand-sub">PostgreSQL & Express.js boshqaruv paneli</p>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <span class="status-pill online">
+                    <span class="status-dot"></span> Port: 1122
+                </span>
+                <button class="btn btn-primary" id="btnOpenAddCarModal">
+                    <i class="fa-solid fa-plus"></i> Yangi mashina
+                </button>
+            </div>
+        </header>
+
+        <!-- Statistika Vidjetlari -->
+        <section class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">
+                    <i class="fa-solid fa-car"></i>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-title">Jami mashinalar</span>
+                    <h3 class="stat-value" id="statTotalCars">...</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-title">Bo'sh (Tayyor)</span>
+                    <h3 class="stat-value" id="statAvailableCars">...</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-orange">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-title">Ijarada (Band)</span>
+                    <h3 class="stat-value" id="statRentedCars">...</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-purple">
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-title">Jami tushum</span>
+                    <h3 class="stat-value" id="statTotalRevenue">...</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sahifa Tablari (Tabs) -->
+        <div class="tabs-header">
+            <button class="tab-btn active" data-tab="tabCars">
+                <i class="fa-solid fa-car-rear"></i> Avtopark (Mashinalar)
+            </button>
+            <button class="tab-btn" data-tab="tabRentals">
+                <i class="fa-solid fa-clipboard-list"></i> Ijaralar jurnali
+            </button>
+        </div>
+
+        <!-- 1-TAB: MASHINALAR BO'LIMI -->
+        <main class="tab-content active" id="tabCars">
+            <!-- Filtr va Qidiruv Paneli -->
+            <div class="filters-card">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Model, brend yoki davlat raqamini qidiring...">
+                </div>
+
+                <div class="filter-controls">
+                    <div class="select-group">
+                        <label><i class="fa-solid fa-filter"></i> Holati:</label>
+                        <select id="filterStatus">
+                            <option value="">Barchasi</option>
+                            <option value="available">Faqat bo'sh mashinalar</option>
+                            <option value="rented">Ijaradagilar</option>
+                            <option value="maintenance">Ta'mirdagilar</option>
+                        </select>
+                    </div>
+
+                    <div class="select-group">
+                        <label><i class="fa-solid fa-copyright"></i> Brend:</label>
+                        <select id="filterBrand">
+                            <option value="">Barcha brendlar</option>
+                            <option value="Chevrolet">Chevrolet</option>
+                            <option value="Kia">Kia</option>
+                            <option value="Hyundai">Hyundai</option>
+                            <option value="BYD">BYD</option>
+                            <option value="Toyota">Toyota</option>
+                            <option value="BMW">BMW</option>
+                        </select>
+                    </div>
+
+                    <div class="select-group">
+                        <label><i class="fa-solid fa-arrow-down-up-across-line"></i> Saralash:</label>
+                        <select id="sortCars">
+                            <option value="id-asc">ID bo'yicha</option>
+                            <option value="price-asc">Narx (arzonroq)</option>
+                            <option value="price-desc">Narx (qimmatroq)</option>
+                            <option value="year-desc">Yili (eng yangi)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-secondary" id="btnResetFilters" title="Filtrni tozalash">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mashinalar Ro'yxati (Grid) -->
+            <div class="cars-grid" id="carsContainer">
+                <div class="loading-spinner">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Mashinalar yuklanmoqda...
+                </div>
+            </div>
+        </main>
+
+        <!-- 2-TAB: IJARALAR BO'LIMI -->
+        <section class="tab-content" id="tabRentals">
+            <div class="rentals-header-bar">
+                <h3><i class="fa-solid fa-file-contract"></i> Barcha ijara shartnomalari</h3>
+                <div class="select-group">
+                    <label>Holat bo'yicha:</label>
+                    <select id="filterRentalStatus">
+                        <option value="">Barcha shartnomalar</option>
+                        <option value="active">Faol ijaralar</option>
+                        <option value="completed">Yakunlanganlar</option>
+                        <option value="cancelled">Bekor qilinganlar</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th># ID</th>
+                            <th>Avtomobil</th>
+                            <th>Mijoz</th>
+                            <th>Telefon / Pasport</th>
+                            <th>Muddat</th>
+                            <th>Jami narx</th>
+                            <th>Holat</th>
+                            <th>Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rentalsTableBody">
+                        <tr>
+                            <td colspan="8" class="text-center">Ijaralar yuklanmoqda...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- MODAL 1: MASHINA QO'SHISH / TAHRIRLASH (10 ta ma'lumot) -->
+    <div class="modal-overlay" id="carModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="carModalTitle"><i class="fa-solid fa-car"></i> Yangi mashina qo'shish</h3>
+                <button class="btn-close" id="btnCloseCarModal">&times;</button>
+            </div>
+            <form id="carForm">
+                <input type="hidden" id="carId">
+                
+                <div class="form-grid">
+                    <!-- 1. Brend -->
+                    <div class="form-group">
+                        <label for="carBrand">1. Ishlab chiqaruvchi (Brend) *</label>
+                        <input type="text" id="carBrand" required placeholder="Masalan: Chevrolet, Kia, Toyota">
+                    </div>
+
+                    <!-- 2. Model -->
+                    <div class="form-group">
+                        <label for="carModel">2. Mashina modeli *</label>
+                        <input type="text" id="carModel" required placeholder="Masalan: Malibu 2, K5, Tracker">
+                    </div>
+
+                    <!-- 3. Yili -->
+                    <div class="form-group">
+                        <label for="carYear">3. Ishlab chiqarilgan yili *</label>
+                        <input type="number" id="carYear" required min="1990" max="2026" placeholder="2023">
+                    </div>
+
+                    <!-- 4. Rangi -->
+                    <div class="form-group">
+                        <label for="carColor">4. Rangi *</label>
+                        <input type="text" id="carColor" required placeholder="Qora, Oq, Kumushrang...">
+                    </div>
+
+                    <!-- 5. Yoqilg'i turi -->
+                    <div class="form-group">
+                        <label for="carFuelType">5. Yoqilg'i turi *</label>
+                        <select id="carFuelType" required>
+                            <option value="Benzin">Benzin</option>
+                            <option value="Benzin + Gaz">Benzin + Gaz</option>
+                            <option value="Gibrid">Gibrid</option>
+                            <option value="Elektro">Elektro</option>
+                            <option value="Dizel">Dizel</option>
+                        </select>
+                    </div>
+
+                    <!-- 6. Uzatmalar qutisi -->
+                    <div class="form-group">
+                        <label for="carTransmission">6. Uzatmalar qutisi *</label>
+                        <select id="carTransmission" required>
+                            <option value="Avtomat">Avtomat</option>
+                            <option value="Mexanika">Mexanika</option>
+                        </select>
+                    </div>
+
+                    <!-- 7. Yurgan masofasi -->
+                    <div class="form-group">
+                        <label for="carMileage">7. Bosib o'tgan masofasi (km) *</label>
+                        <input type="number" id="carMileage" required min="0" placeholder="Masalan: 18000">
+                    </div>
+
+                    <!-- 8. Davlat raqami -->
+                    <div class="form-group">
+                        <label for="carLicensePlate">8. Davlat raqami (Plate) *</label>
+                        <input type="text" id="carLicensePlate" required placeholder="01 A 777 AA" style="text-transform: uppercase;">
+                    </div>
+
+                    <!-- 9. Kunlik ijara narxi -->
+                    <div class="form-group">
+                        <label for="carDailyPrice">9. Kunlik narxi (so'm) *</label>
+                        <input type="number" id="carDailyPrice" required min="10000" step="10000" placeholder="600000">
+                    </div>
+
+                    <!-- 10. Holati -->
+                    <div class="form-group">
+                        <label for="carStatus">10. Mashina holati *</label>
+                        <select id="carStatus" required>
+                            <option value="available">Bo'sh (available)</option>
+                            <option value="rented">Ijarada (rented)</option>
+                            <option value="maintenance">Ta'mirda (maintenance)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancelCarModal">Bekor qilish</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveCar">Saqlash</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: IJARAGA BERISH MODALI -->
+    <div class="modal-overlay" id="rentModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-key"></i> Avtomobilni ijaraga berish</h3>
+                <button class="btn-close" id="btnCloseRentModal">&times;</button>
+            </div>
+            <form id="rentForm">
+                <input type="hidden" id="rentCarId">
+
+                <!-- Tanlangan mashina qisqacha kartochkasi -->
+                <div class="selected-car-badge" id="selectedCarInfo">
+                    <span id="rentCarTitle">Mashina yuklanmoqda...</span>
+                    <strong id="rentCarPrice">0 so'm / kun</strong>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="customerName">Mijozning to'liq F.I.SH *</label>
+                        <input type="text" id="customerName" required placeholder="Masalan: Sardor Rahimberdiyev">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customerPhone">Telefon raqami *</label>
+                        <input type="tel" id="customerPhone" required placeholder="+998 90 123 45 67">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customerPassport">Pasport seriyasi va raqami *</label>
+                        <input type="text" id="customerPassport" required placeholder="AA 1234567" style="text-transform: uppercase;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="startDate">Boshlanish sanasi *</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endDate">Tugash sanasi *</label>
+                        <input type="date" id="endDate" required>
+                    </div>
+                </div>
+
+                <!-- Hisoblangan summa bloki -->
+                <div class="calculation-summary">
+                    <div>
+                        <span>Ijara muddati:</span>
+                        <strong id="calcDays">0 kun</strong>
+                    </div>
+                    <div>
+                        <span>Jami to'lov:</span>
+                        <strong class="total-highlight" id="calcTotalPrice">0 so'm</strong>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancelRentModal">Bekor qilish</button>
+                    <button type="submit" class="btn btn-success" id="btnConfirmRent">
+                        <i class="fa-solid fa-check"></i> Ijarani rasmiylashtirish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bildirishnomalar (Toast) -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Frontend Skripti -->
+    <script src="app.js"></script>
+</body>
+</html>
+
